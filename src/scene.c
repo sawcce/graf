@@ -15,13 +15,9 @@ sg_bindings bind;
 
 void scene_setup()
 {
-    printf("Buffer\n");
-
     vbuf = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(vertices)});
 
-    printf("Shader\n");
-    /* a shader */
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
             "#version 330\n"
@@ -40,8 +36,6 @@ void scene_setup()
             "  frag_color = color;\n"
             "}\n"});
 
-    printf("Pipeline\n");
-    /* a pipeline state object (default render states are fine for triangle) */
     pip = sg_make_pipeline(&(sg_pipeline_desc){
         .shader = shd,
         .layout = {
@@ -49,8 +43,6 @@ void scene_setup()
                 [0].format = SG_VERTEXFORMAT_FLOAT3,
                 [1].format = SG_VERTEXFORMAT_FLOAT4}}});
 
-    printf("Bind\n");
-    /* resource bindings */
     bind = (sg_bindings){
         .vertex_buffers[0] = vbuf};
 }
