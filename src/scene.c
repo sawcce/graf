@@ -5,34 +5,35 @@
 
 typedef struct
 {
-    float *vertices;
-    float vertices_length;
-    float vertices_amount;
+    sg_range vertices;
     sg_buffer buffer;
     sg_bindings bindings;
 } Mesh;
 
-Mesh make_mesh(float vertices[], int length)
+Mesh make_mesh(sg_range vertices)
 {
+    sg_buffer buff = sg_make_buffer(&(sg_buffer_desc){
+        .data = vertices});
+
     return (Mesh){
         .vertices = vertices,
-        .vertices_length = length,
-        .vertices_amount = length / VERTICE_LENGTH,
-        .buffer = sg_make_buffer(&(sg_buffer_desc){
-            .data = (sg_range){.ptr = vertices, .size = length}})};
+        .buffer = buff,
+        .bindings = (sg_bindings){
+            .vertex_buffers[0] = buff}};
 }
 
-void bind_mesh(Mesh *mesh)
+/* void bind_mesh(Mesh *mesh)
 {
     mesh->bindings = (sg_bindings){
-        .vertex_buffers[0] = mesh->buffer};
-}
+        .vertex_buffers[0] = *mesh->buffer};
+} */
 
-void render_mesh(Mesh mesh, sg_pipeline pip)
+void render_mesh(Mesh *mesh, sg_pipeline pip)
 {
+    printf("RENDER\n");
     sg_apply_pipeline(pip);
-    sg_apply_bindings(&mesh.bindings);
-    sg_draw(0, mesh.vertices_amount, 1);
+    sg_apply_bindings(&mesh->bindings);
+    sg_draw(0, 3, 1);
 }
 
 /* a vertex buffer */
@@ -43,15 +44,14 @@ const float vertices[] = {
     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f};
 
 Mesh triangle;
-sg_buffer vbuf;
+
 sg_shader shd;
 sg_pipeline pip;
-sg_bindings bind;
 
 void scene_setup()
 {
-    triangle = make_mesh(vertices, 21);
-    bind_mesh(&triangle);
+    triangle = make_mesh(SG_RANGE(vertices));
+    // bind_mesh(&triangle);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -81,5 +81,5 @@ void scene_setup()
 
 void scene_draw()
 {
-    render_mesh(triangle, pip);
+    render_mesh(&triangle, pip);
 }
