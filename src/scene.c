@@ -22,12 +22,6 @@ Mesh make_mesh(sg_range vertices)
             .vertex_buffers[0] = buff}};
 }
 
-/* void bind_mesh(Mesh *mesh)
-{
-    mesh->bindings = (sg_bindings){
-        .vertex_buffers[0] = *mesh->buffer};
-} */
-
 void render_mesh(Mesh *mesh, sg_pipeline pip)
 {
     printf("RENDER\n");
