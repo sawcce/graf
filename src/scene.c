@@ -24,7 +24,6 @@ Mesh make_mesh(sg_range vertices)
 
 void render_mesh(Mesh *mesh, sg_pipeline pip)
 {
-    sg_apply_pipeline(pip);
     sg_apply_bindings(&mesh->bindings);
     sg_draw(0, 3, 1);
 }
@@ -60,9 +59,18 @@ void scene_setup()
             "#version 330\n"
             "in vec4 color;\n"
             "out vec4 frag_color;\n"
+            "uniform float col;"
             "void main() {\n"
-            "  frag_color = color;\n"
-            "}\n"});
+            "  frag_color = color + col;\n"
+            "}\n",
+
+        .fs.uniform_blocks[0] = {
+            .size = sizeof(int),
+            .uniforms = {
+                [0] = {.name = "col", .type = SG_UNIFORMTYPE_FLOAT},
+            },
+        },
+    });
 
     pip = sg_make_pipeline(&(sg_pipeline_desc){
         .shader = shd,
@@ -72,7 +80,18 @@ void scene_setup()
                 [1].format = SG_VERTEXFORMAT_FLOAT4}}});
 }
 
+float data = 0;
+
 void scene_draw()
 {
+    data += 0.005f;
+
+    if (data > 1.0f)
+    {
+        data = 0;
+    }
+
+    sg_apply_pipeline(pip);
+    sg_apply_uniforms(SG_SHADERSTAGE_FS, 0, &SG_RANGE(data));
     render_mesh(&triangle, pip);
 }
