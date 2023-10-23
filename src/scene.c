@@ -24,7 +24,6 @@ Mesh make_mesh(sg_range vertices)
 
 void render_mesh(Mesh *mesh, sg_pipeline pip)
 {
-    printf("RENDER\n");
     sg_apply_pipeline(pip);
     sg_apply_bindings(&mesh->bindings);
     sg_draw(0, 3, 1);
