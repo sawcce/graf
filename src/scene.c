@@ -1,6 +1,40 @@
 #include "scene.h"
 #include "sokol_gfx.h"
 
+#define VERTICE_LENGTH 7
+
+typedef struct
+{
+    float *vertices;
+    float vertices_length;
+    float vertices_amount;
+    sg_buffer buffer;
+    sg_bindings bindings;
+} Mesh;
+
+Mesh make_mesh(float vertices[], int length)
+{
+    return (Mesh){
+        .vertices = vertices,
+        .vertices_length = length,
+        .vertices_amount = length / VERTICE_LENGTH,
+        .buffer = sg_make_buffer(&(sg_buffer_desc){
+            .data = (sg_range){.ptr = vertices, .size = length}})};
+}
+
+void bind_mesh(Mesh *mesh)
+{
+    mesh->bindings = (sg_bindings){
+        .vertex_buffers[0] = mesh->buffer};
+}
+
+void render_mesh(Mesh mesh, sg_pipeline pip)
+{
+    sg_apply_pipeline(pip);
+    sg_apply_bindings(&mesh.bindings);
+    sg_draw(0, mesh.vertices_amount, 1);
+}
+
 /* a vertex buffer */
 const float vertices[] = {
     // positions            // colors
@@ -8,6 +42,7 @@ const float vertices[] = {
     0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f};
 
+Mesh triangle;
 sg_buffer vbuf;
 sg_shader shd;
 sg_pipeline pip;
@@ -15,8 +50,8 @@ sg_bindings bind;
 
 void scene_setup()
 {
-    vbuf = sg_make_buffer(&(sg_buffer_desc){
-        .data = SG_RANGE(vertices)});
+    triangle = make_mesh(vertices, 21);
+    bind_mesh(&triangle);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -42,14 +77,9 @@ void scene_setup()
             .attrs = {
                 [0].format = SG_VERTEXFORMAT_FLOAT3,
                 [1].format = SG_VERTEXFORMAT_FLOAT4}}});
-
-    bind = (sg_bindings){
-        .vertex_buffers[0] = vbuf};
 }
 
 void scene_draw()
 {
-    sg_apply_pipeline(pip);
-    sg_apply_bindings(&bind);
-    sg_draw(0, 3, 1);
+    render_mesh(triangle, pip);
 }
