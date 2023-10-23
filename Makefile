@@ -1,6 +1,6 @@
 sources := main.c
 outputs = $(wildcard build/*.o)
-INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc -Isrc/
+INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/
 
 NAME = el.exe
 
@@ -18,12 +18,17 @@ bootstrap: sokol logc
 	mkdir build
 
 build/main.o: src/main.c
+	@echo "Building main..."
 	@$(CC) src/main.c -c -o build/main.o $(CFLAGS) $(INC) $(SOKOL)
 
-build/scene.o: src/main.c
+build/scene.o: src/scene.c
+	@echo "Building scene..."
 	@$(CC) src/scene.c -c -o build/scene.o $(CFLAGS) $(INC) $(SOKOL)
 
-exe: src/main.c src/scene.c
+build/log.o: lib/logc/src/log.c
+	@$(CC) lib/logc/src/log.c -c -o build/log.o $(CFLAGS)
+
+exe: build/main.o build/scene.o build/log.o
 	@echo $(outputs)
 	$(CC) $(outputs) -o build/$(NAME) -Wall $(CFLAGS) $(INC) $(SOKOL)
 

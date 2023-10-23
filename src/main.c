@@ -6,12 +6,13 @@
 #include "sokol_glue.h"
 
 #include "scene.h"
+#include "log.h"
 
 sg_pass_action pass_action;
 
 void init(void)
 {
-    printf("Setup\n");
+    log_info("Initiating setup");
 
     sg_setup(&(sg_desc){
         .context = sapp_sgcontext(),
@@ -21,6 +22,8 @@ void init(void)
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {1.0f, 0.0f, 0.0f, 1.0f}}};
 
     scene_setup();
+
+    log_info("Finished with setup");
 }
 
 void frame(void)
