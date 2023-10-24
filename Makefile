@@ -25,7 +25,7 @@ build/stc:
 	$(CC) lib/stc/src/libstc.c -c -o build/libstc.o $(CFLAGS) $(INC)
 
 .PHONY: bootstrap
-bootstrap: sokol logc cglm
+bootstrap: sokol logc cglm stc build/stc
 	mkdir build
 
 build/main.o: src/main.c
@@ -47,7 +47,7 @@ $(src):
 	echo "Building: $@" "$<"
 	$(CC) $@ -c -o build/$(@:src/components/%.c=%.o) $(CFLAGS) $(INC) $(SOKOL)
 
-exe: build/main.o build/scene.o all build/log.o
+exe: build/main.o build/scene.o all build/log.o build/stc
 	@echo "Outputs: " $(outputs)
 	@echo "Outputs: " $(obj)
 	$(CC) $(outputs) -o build/$(NAME) -Wall $(CFLAGS) $(INC) $(SOKOL)
