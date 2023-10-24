@@ -38,8 +38,8 @@ void compute_transform(Transform *transform)
     glm_quat_mat4(transform->rotation, rot);
 
     mat4 computed;
-    glm_mul(rot, scale, computed);
-    glm_mul(trans, computed, computed);
+    glm_mat4_mul(rot, scale, computed);
+    glm_mat4_mul(trans, computed, computed);
 
     glm_mat4_copy(computed, transform->computed);
 }
@@ -65,9 +65,9 @@ void render_mesh(Mesh *mesh, sg_pipeline pip)
 /* a vertex buffer */
 const float vertices[] = {
     // positions            // colors
-    0.0f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f};
+    0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f};
 
 Mesh triangle;
 
@@ -77,7 +77,6 @@ sg_pipeline pip;
 void scene_setup()
 {
     triangle = make_mesh(SG_RANGE(vertices));
-    // bind_mesh(&triangle);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -122,15 +121,7 @@ float j = 0;
 
 void scene_draw()
 {
-    mat4 *c = transform.computed;
-
-    for (int i = 0; i < 4; i++)
-    {
-        printf("i = %d, %F %F %F %f\n", i, (*c)[i][0], (*c)[i][1], (*c)[i][2], (*c)[i][3]);
-    }
-    printf("-------------------\n");
-    // TODO: Fix rotation point
-    rotate_euler(&transform, (vec3){j, j, j});
+    rotate_euler(&transform, (vec3){0, j, 0});
     j += 0.01f;
     compute_transform(&transform);
 
