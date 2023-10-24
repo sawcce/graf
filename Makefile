@@ -1,6 +1,8 @@
 sources := main.c
-outputs = $(wildcard build/*.o)
+outputs = $(wildcard build/*.o) $(wildcard lib/cglm/build/**.o)
 INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include
+
+cglmI = $(wildcard lib/cglm/src/**.c)
 
 NAME = el.exe
 
@@ -30,6 +32,10 @@ build/scene.o: src/scene.c
 
 build/log.o: lib/logc/src/log.c
 	@$(CC) lib/logc/src/log.c -c -o build/log.o $(CFLAGS)
+
+.PHONY: $(cglmI)
+$(cglmI):
+	@$(CC) $@ -c -o build/$(@:lib/cglm/src/%.c=%.o) $(CFLAGS) $(INC)
 
 exe: build/main.o build/scene.o build/log.o
 	@echo $(outputs)
