@@ -1,6 +1,6 @@
 sources := main.c
 outputs = $(wildcard build/*.o)
-INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/
+INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include
 
 NAME = el.exe
 
@@ -13,8 +13,11 @@ sokol:
 logc:
 	@git clone https://github.com/rxi/log.c lib/logc 
 
+cglm:
+	@git clone https://github.com/recp/cglm lib/cglm
+
 .PHONY: bootstrap
-bootstrap: sokol logc
+bootstrap: sokol logc cglm
 	mkdir build
 
 build/main.o: src/main.c
