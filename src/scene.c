@@ -90,7 +90,9 @@ void scene_step()
 void scene_draw()
 {
     rotate_euler(&transform, (vec3){0, j, 0});
-    j += 0.01f;
     compute_transform(&transform);
+
+    j += 0.01f;
+
     scene_step();
 }
