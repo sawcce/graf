@@ -1,8 +1,7 @@
-sources := main.c
-outputs = $(wildcard build/*.o) $(wildcard lib/cglm/build/**.o)
 INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include
 
-cglmI = $(wildcard lib/cglm/src/**.c)
+src = $(wildcard src/components/*.c)
+outputs = $(wildcard build/*.o)
 
 NAME = el.exe
 
@@ -24,29 +23,26 @@ bootstrap: sokol logc cglm
 
 build/main.o: src/main.c
 	@echo "Building main..."
-	@$(CC) src/main.c -c -o build/main.o $(CFLAGS) $(INC) $(SOKOL)
+	$(CC) src/main.c -c -o build/main.o $(CFLAGS) $(INC) $(SOKOL)
 
 build/scene.o: src/scene.c
 	@echo "Building scene..."
-	@$(CC) src/scene.c -c -o build/scene.o $(CFLAGS) $(INC) $(SOKOL)
-
-build/mesh.o: src/components/mesh.c
-	@echo "Building mesh..."
-	@$(CC) src/components/mesh.c -c -o build/mesh.o $(CFLAGS) $(INC) $(SOKOL)
-
-build/transform.o: src/components/transform.c
-	@echo "Building transform..."
-	@$(CC) src/components/transform.c -c -o build/transform.o $(CFLAGS) $(INC) $(SOKOL)
+	$(CC) src/scene.c -c -o build/scene.o $(CFLAGS) $(INC) $(SOKOL)
 
 build/log.o: lib/logc/src/log.c
-	@$(CC) lib/logc/src/log.c -c -o build/log.o $(CFLAGS)
+	$(CC) lib/logc/src/log.c -c -o build/log.o $(CFLAGS)
 
-.PHONY: $(cglmI)
-$(cglmI):
-	@$(CC) $@ -c -o build/$(@:lib/cglm/src/%.c=%.o) $(CFLAGS) $(INC)
+# I am fully aware that this is far from optimal and idiomatical
+# but this is the best solution I could come up with for now
+.PHONY: all $(src)
+all: $(src)
+$(src):
+	echo "Building: $@" "$<"
+	$(CC) $@ -c -o build/$(@:src/components/%.c=%.o) $(CFLAGS) $(INC) $(SOKOL)
 
-exe: build/main.o build/scene.o build/mesh.o build/transform.o build/log.o
-	@echo $(outputs)
+exe: build/main.o build/scene.o all build/log.o
+	@echo "Outputs: " $(outputs)
+	@echo "Outputs: " $(obj)
 	$(CC) $(outputs) -o build/$(NAME) -Wall $(CFLAGS) $(INC) $(SOKOL)
 
 build: exe
