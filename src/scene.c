@@ -4,6 +4,7 @@
 
 #include "components/mesh.h"
 #include "components/transform.h"
+#include "ecs.h"
 
 /* a vertex buffer */
 const float vertices[] = {
@@ -23,9 +24,20 @@ Transform transform = {
     .rotation = {0.3f, 0, 0, 0.7f},
 };
 
+Scene scene;
+
 void scene_setup()
 {
+    scene.entities = c_init(cmap_entity, {});
+
+    Entity entity = {
+        .components = {
+            [0] = (Component){.type = CT_MESH, .component = &triangle},
+        },
+    };
+
     triangle = make_mesh(SG_RANGE(vertices), &transform);
+    cmap_entity_insert(&scene.entities, 0, entity);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -62,11 +74,23 @@ void scene_setup()
 
 float j = 0;
 
+void scene_step()
+{
+    c_foreach(entity, cmap_entity, scene)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            Component component = entity.ref->second.components[0];
+            if (component.type == CT_MESH)
+                render_mesh(component.component, pip);
+        }
+    }
+}
+
 void scene_draw()
 {
     rotate_euler(&transform, (vec3){0, j, 0});
     j += 0.01f;
     compute_transform(&transform);
-
-    render_mesh(&triangle, pip);
+    scene_step();
 }

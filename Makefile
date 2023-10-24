@@ -1,4 +1,4 @@
-INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include
+INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include -Ilib/stc/include
 
 src = $(wildcard src/components/*.c)
 outputs = $(wildcard build/*.o)
@@ -16,6 +16,13 @@ logc:
 
 cglm:
 	@git clone https://github.com/recp/cglm lib/cglm
+
+stc:
+	@git clone https://github.com/stclib/stc lib/stc 
+
+.PHONY: build/stc
+build/stc:
+	$(CC) lib/stc/src/libstc.c -c -o build/libstc.o $(CFLAGS) $(INC)
 
 .PHONY: bootstrap
 bootstrap: sokol logc cglm
