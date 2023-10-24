@@ -30,6 +30,14 @@ build/scene.o: src/scene.c
 	@echo "Building scene..."
 	@$(CC) src/scene.c -c -o build/scene.o $(CFLAGS) $(INC) $(SOKOL)
 
+build/mesh.o: src/components/mesh.c
+	@echo "Building mesh..."
+	@$(CC) src/components/mesh.c -c -o build/mesh.o $(CFLAGS) $(INC) $(SOKOL)
+
+build/transform.o: src/components/transform.c
+	@echo "Building transform..."
+	@$(CC) src/components/transform.c -c -o build/transform.o $(CFLAGS) $(INC) $(SOKOL)
+
 build/log.o: lib/logc/src/log.c
 	@$(CC) lib/logc/src/log.c -c -o build/log.o $(CFLAGS)
 
@@ -37,7 +45,7 @@ build/log.o: lib/logc/src/log.c
 $(cglmI):
 	@$(CC) $@ -c -o build/$(@:lib/cglm/src/%.c=%.o) $(CFLAGS) $(INC)
 
-exe: build/main.o build/scene.o build/log.o
+exe: build/main.o build/scene.o build/mesh.o build/transform.o build/log.o
 	@echo $(outputs)
 	$(CC) $(outputs) -o build/$(NAME) -Wall $(CFLAGS) $(INC) $(SOKOL)
 
