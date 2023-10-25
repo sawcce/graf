@@ -80,7 +80,7 @@ void scene_step()
     {
         for (int i = 0; i < 3; i++)
         {
-            Component component = entity.ref->second.components[0];
+            Component component = entity.ref->second.components[i];
             if (component.type == CT_MESH)
                 render_mesh(component.component, pip);
         }
