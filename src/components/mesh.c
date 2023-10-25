@@ -1,17 +1,17 @@
 #include "mesh.h"
 
-Mesh make_mesh(sg_range vertices, sg_range indices, Transform *transform)
+Mesh make_mesh(MeshData mesh_data, Transform *transform)
 {
     sg_buffer v_buff = sg_make_buffer(&(sg_buffer_desc){
         .type = SG_BUFFERTYPE_VERTEXBUFFER,
-        .data = vertices});
+        .data = mesh_data.vertices});
 
     sg_buffer i_buff = sg_make_buffer(&(sg_buffer_desc){
         .type = SG_BUFFERTYPE_INDEXBUFFER,
-        .data = indices});
+        .data = mesh_data.indices});
 
     return (Mesh){
-        .vertices = vertices,
+        .mesh_data = mesh_data,
         .transform = transform,
         .bindings = (sg_bindings){
             .vertex_buffers[0] = v_buff,

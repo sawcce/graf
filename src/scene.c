@@ -19,6 +19,11 @@ const int indices[] = {
     2,
 };
 
+MeshData triangle_data = {
+    .vertices = SG_RANGE(vertices),
+    .indices = SG_RANGE(indices),
+};
+
 Mesh triangle;
 Mesh triangle2;
 
@@ -55,10 +60,10 @@ void scene_setup()
         },
     };
 
-    triangle = make_mesh(SG_RANGE(vertices), SG_RANGE(indices), &transform);
+    triangle = make_mesh(triangle_data, &transform);
     cmap_entity_insert(&scene.entities, 0, entity);
 
-    triangle2 = make_mesh(SG_RANGE(vertices), SG_RANGE(indices), &transform2);
+    triangle2 = make_mesh(triangle_data, &transform2);
     cmap_entity_insert(&scene.entities, 1, entity2);
 
     shd = sg_make_shader(&(sg_shader_desc){
