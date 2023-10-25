@@ -51,12 +51,14 @@ void scene_setup()
     Entity entity = {
         .components = {
             [0] = (Component){.type = CT_MESH, .component = &triangle},
+            [1] = (Component){.type = CT_TRANSFORM, .component = &transform},
         },
     };
 
     Entity entity2 = {
         .components = {
             [0] = (Component){.type = CT_MESH, .component = &triangle2},
+            [1] = (Component){.type = CT_TRANSFORM, .component = &transform2},
         },
     };
 
