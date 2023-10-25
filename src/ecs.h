@@ -2,7 +2,7 @@
 
 typedef enum
 {
-    CT_MESH = 0,
+    CT_MESH = 1,
     CT_TRANSFORM,
     CT_CAMERA,
 } Type;
