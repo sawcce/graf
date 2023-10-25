@@ -1,16 +1,23 @@
 #include "mesh.h"
 
-Mesh make_mesh(sg_range vertices, Transform *transform)
+Mesh make_mesh(sg_range vertices, sg_range indices, Transform *transform)
 {
-    sg_buffer buff = sg_make_buffer(&(sg_buffer_desc){
+    sg_buffer v_buff = sg_make_buffer(&(sg_buffer_desc){
+        .type = SG_BUFFERTYPE_VERTEXBUFFER,
         .data = vertices});
+
+    sg_buffer i_buff = sg_make_buffer(&(sg_buffer_desc){
+        .type = SG_BUFFERTYPE_INDEXBUFFER,
+        .data = indices});
 
     return (Mesh){
         .vertices = vertices,
-        .buffer = buff,
         .transform = transform,
         .bindings = (sg_bindings){
-            .vertex_buffers[0] = buff}};
+            .vertex_buffers[0] = v_buff,
+            .index_buffer = i_buff,
+        },
+    };
 }
 
 void render_mesh(Mesh *mesh, sg_pipeline pip)

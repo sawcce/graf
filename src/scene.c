@@ -13,6 +13,12 @@ const float vertices[] = {
     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f};
 
+const int indices[] = {
+    0,
+    1,
+    2,
+};
+
 Mesh triangle;
 Mesh triangle2;
 
@@ -49,10 +55,10 @@ void scene_setup()
         },
     };
 
-    triangle = make_mesh(SG_RANGE(vertices), &transform);
+    triangle = make_mesh(SG_RANGE(vertices), SG_RANGE(indices), &transform);
     cmap_entity_insert(&scene.entities, 0, entity);
 
-    triangle2 = make_mesh(SG_RANGE(vertices), &transform2);
+    triangle2 = make_mesh(SG_RANGE(vertices), SG_RANGE(indices), &transform2);
     cmap_entity_insert(&scene.entities, 1, entity2);
 
     shd = sg_make_shader(&(sg_shader_desc){
@@ -81,6 +87,7 @@ void scene_setup()
     });
 
     pip = sg_make_pipeline(&(sg_pipeline_desc){
+        .index_type = SG_INDEXTYPE_UINT32,
         .shader = shd,
         .layout = {
             .attrs = {
@@ -105,8 +112,8 @@ void scene_step()
 
 void scene_draw()
 {
-    rotate_euler(&transform, (vec3){0, j, 0});
-    rotate_euler(&transform2, (vec3){0, j, 0});
+    rotate_euler(&transform, (vec3){j / 10.0f, j, 0});
+    rotate_euler(&transform2, (vec3){j / 10.0f, j, 0});
     compute_transform(&transform);
     compute_transform(&transform2);
 

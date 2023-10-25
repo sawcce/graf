@@ -6,10 +6,9 @@
 typedef struct
 {
     sg_range vertices;
-    sg_buffer buffer;
     sg_bindings bindings;
     Transform *transform;
 } Mesh;
 
-Mesh make_mesh(sg_range vertices, Transform *transform);
+Mesh make_mesh(sg_range vertices, sg_range indices, Transform *transform);
 void render_mesh(Mesh *mesh, sg_pipeline pip);
