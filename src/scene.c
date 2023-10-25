@@ -14,14 +14,21 @@ const float vertices[] = {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f};
 
 Mesh triangle;
+Mesh triangle2;
 
 sg_shader shd;
 sg_pipeline pip;
 
 Transform transform = {
     .position = {0, 0.5f, 0},
-    .scale = {1.5, 1, 1},
+    .scale = {0.5f, 0.5f, 0.5f},
     .rotation = {0.3f, 0, 0, 0.7f},
+};
+
+Transform transform2 = {
+    .position = {0, 0.0f, 0},
+    .scale = {0.5f, 0.5f, 0.5f},
+    .rotation = {0.0f, 0, 0, 0.0f},
 };
 
 Scene scene;
@@ -36,8 +43,17 @@ void scene_setup()
         },
     };
 
+    Entity entity2 = {
+        .components = {
+            [0] = (Component){.type = CT_MESH, .component = &triangle2},
+        },
+    };
+
     triangle = make_mesh(SG_RANGE(vertices), &transform);
     cmap_entity_insert(&scene.entities, 0, entity);
+
+    triangle2 = make_mesh(SG_RANGE(vertices), &transform2);
+    cmap_entity_insert(&scene.entities, 1, entity2);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -90,7 +106,9 @@ void scene_step()
 void scene_draw()
 {
     rotate_euler(&transform, (vec3){0, j, 0});
+    rotate_euler(&transform2, (vec3){0, j, 0});
     compute_transform(&transform);
+    compute_transform(&transform2);
 
     j += 0.01f;
 
