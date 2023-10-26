@@ -23,6 +23,7 @@ const int indices[] = {
 MeshData triangle_data = {
     .vertices = SG_RANGE(vertices),
     .indices = SG_RANGE(indices),
+    .elements_amount = 3,
     .id = "triangular",
 };
 

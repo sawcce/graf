@@ -7,6 +7,7 @@
 
 typedef struct
 {
+    int elements_amount;
     sg_range vertices;
     sg_range indices;
 #ifdef MESH_DEBUG
