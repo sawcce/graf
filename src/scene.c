@@ -34,13 +34,11 @@ sg_pipeline pip;
 Transform transform = {
     .position = {0, 0.5f, 0},
     .scale = {0.5f, 0.5f, 0.5f},
-    .rotation = {0.3f, 0, 0, 0.7f},
 };
 
 Transform transform2 = {
     .position = {0, 0.0f, 0},
     .scale = {0.5f, 0.5f, 0.5f},
-    .rotation = {0.0f, 0, 0, 0.0f},
 };
 
 Scene *scene;
