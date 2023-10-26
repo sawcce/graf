@@ -49,13 +49,19 @@ void scene_setup()
 
     scene = new_scene();
 
-    EntityID entity = new_entity(scene);
-    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
-    assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
+    const int iter = 5000;
+    for (int i = 0; i < 10000; i++)
+    {
+        const float pos = ((float)i / ((float)iter / 2.0f)) - 1.0f;
+        Transform transform = {
+            .position = {pos, pos, 0},
+            .scale = {0.1f, 0.1f, 0.1f},
+        };
 
-    EntityID entity2 = new_entity(scene);
-    assign_to_entity(scene, entity2, CT_MESH, sizeof(Mesh), &triangle);
-    assign_to_entity(scene, entity2, CT_TRANSFORM, sizeof(Transform), &transform2);
+        EntityID entity = new_entity(scene);
+        assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
+        assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
+    }
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -97,7 +103,7 @@ void mesh_system()
 {
     c_forpair(entity, type_set, cmap_entities, scene->entities)
     {
-        log_debug("Entity ( %d ) with TS of size: %d", *_.entity, _.type_set->size);
+        // log_debug("Entity ( %d ) with TS of size: %d", *_.entity, _.type_set->size);
 
         if (TypeSet_get(_.type_set, CT_MESH) == NULL || TypeSet_get(_.type_set, CT_TRANSFORM) == NULL)
             continue;
