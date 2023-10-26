@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		"*.goria": "html",
+		"*.mustache": "html",
+		"cmap.h": "c",
+		"cset.h": "c",
+		"chrono": "c",
+		"utility": "c",
+		"csset.h": "c"
+	}
+}

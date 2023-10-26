@@ -1,29 +1,44 @@
 #pragma once
 
+#define EntityID int64_t
+
 typedef enum
 {
     CT_MESH = 1,
     CT_TRANSFORM,
     CT_CAMERA,
-} Type;
+} CType;
 
-typedef struct
-{
-    Type type;
-    void *component;
-} Component;
+// cset_ctype: A hashset of component types
+#define i_key CType
+#define i_type TypeSet
+#include "stc/cset.h"
 
-typedef struct
-{
-    Component components[3];
-} Entity;
+// cmap_entity: A map of EntityIDs and the set of the Component Types
+// assigned to them
+#define i_key EntityID
+#define i_val TypeSet
+#define i_tag entities
+#include "stc/cmap.h"
 
-#define i_key int
-#define i_val Entity
-#define i_tag entity
+#define i_key EntityID
+#define i_val void *
+#define i_type Pool
+#include "stc/cmap.h"
+
+#define i_key CType
+#define i_val Pool
+#define i_type Pools
 #include "stc/cmap.h"
 
 typedef struct
 {
-    cmap_entity entities;
+    Pools pools;
+    cmap_entities entities;
 } Scene;
+
+Scene *new_scene();
+
+EntityID new_entity(Scene *scene);
+void assign_to_entity(Scene *scene, EntityID entity, CType type, void *component);
+void *get_component_for_entity(Scene *scene, EntityID entity, CType type);

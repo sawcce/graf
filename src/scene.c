@@ -5,6 +5,7 @@
 #include "components/mesh.h"
 #include "components/transform.h"
 #include "ecs.h"
+#include "log.h"
 
 /* a vertex buffer */
 const float vertices[] = {
@@ -22,6 +23,7 @@ const int indices[] = {
 MeshData triangle_data = {
     .vertices = SG_RANGE(vertices),
     .indices = SG_RANGE(indices),
+    .id = "triangle",
 };
 
 Mesh triangle;
@@ -42,31 +44,23 @@ Transform transform2 = {
     .rotation = {0.0f, 0, 0, 0.0f},
 };
 
-Scene scene;
+Scene *scene;
 
 void scene_setup()
 {
-    scene.entities = c_init(cmap_entity, {});
-
-    Entity entity = {
-        .components = {
-            [0] = (Component){.type = CT_MESH, .component = &triangle},
-            [1] = (Component){.type = CT_TRANSFORM, .component = &transform},
-        },
-    };
-
-    Entity entity2 = {
-        .components = {
-            [0] = (Component){.type = CT_MESH, .component = &triangle2},
-            [1] = (Component){.type = CT_TRANSFORM, .component = &transform2},
-        },
-    };
-
+    log_debug("Meshes");
     triangle = make_mesh(triangle_data, &transform);
-    cmap_entity_insert(&scene.entities, 0, entity);
-
     triangle2 = make_mesh(triangle_data, &transform2);
-    cmap_entity_insert(&scene.entities, 1, entity2);
+
+    scene = new_scene();
+
+    EntityID entity = new_entity(scene);
+    assign_to_entity(scene, entity, CT_MESH, &triangle);
+    assign_to_entity(scene, entity, CT_TRANSFORM, &transform);
+
+    EntityID entity2 = new_entity(scene);
+    assign_to_entity(scene, entity2, CT_MESH, &triangle2);
+    assign_to_entity(scene, entity2, CT_TRANSFORM, &transform2);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -102,20 +96,22 @@ void scene_setup()
                 [1].format = SG_VERTEXFORMAT_FLOAT4}}});
 }
 
-float j = 0;
-
-void scene_step()
+void mesh_system()
 {
-    c_foreach(entity, cmap_entity, scene)
+    c_forpair(entity, type_set, cmap_entities, scene->entities)
     {
-        for (int i = 0; i < 3; i++)
-        {
-            Component component = entity.ref->second.components[i];
-            if (component.type == CT_MESH)
-                render_mesh(component.component, pip);
-        }
+        log_debug("Entity ( %d ) with TS of size: %d", *_.entity, _.type_set->size);
+
+        if (TypeSet_get(_.type_set, CT_MESH) == NULL)
+            continue;
+
+        Mesh *mesh = get_component_for_entity(scene, *_.entity, CT_MESH);
+
+        render_mesh(mesh, pip);
     }
 }
+
+float j = 0;
 
 void scene_draw()
 {
@@ -126,5 +122,5 @@ void scene_draw()
 
     j += 0.01f;
 
-    scene_step();
+    mesh_system();
 }
