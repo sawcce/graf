@@ -23,11 +23,10 @@ const int indices[] = {
 MeshData triangle_data = {
     .vertices = SG_RANGE(vertices),
     .indices = SG_RANGE(indices),
-    .id = "triangle",
+    .id = "triangular",
 };
 
 Mesh triangle;
-Mesh triangle2;
 
 sg_shader shd;
 sg_pipeline pip;
@@ -48,18 +47,17 @@ Scene *scene;
 
 void scene_setup()
 {
-    triangle = make_mesh(triangle_data, &transform);
-    triangle2 = make_mesh(triangle_data, &transform2);
+    triangle = make_mesh(triangle_data);
 
     scene = new_scene();
 
     EntityID entity = new_entity(scene);
-    assign_to_entity(scene, entity, CT_MESH, &triangle);
-    assign_to_entity(scene, entity, CT_TRANSFORM, &transform);
+    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
+    assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
 
     EntityID entity2 = new_entity(scene);
-    assign_to_entity(scene, entity2, CT_MESH, &triangle2);
-    assign_to_entity(scene, entity2, CT_TRANSFORM, &transform2);
+    assign_to_entity(scene, entity2, CT_MESH, sizeof(Mesh), &triangle);
+    assign_to_entity(scene, entity2, CT_TRANSFORM, sizeof(Transform), &transform2);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -112,7 +110,7 @@ void mesh_system()
         rotate_euler(transform, (vec3){j / 10.0f, j, 0});
         compute_transform(transform);
 
-        render_mesh(mesh, pip);
+        render_mesh(mesh, transform, pip);
     }
 }
 
