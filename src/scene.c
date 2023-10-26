@@ -48,7 +48,6 @@ Scene *scene;
 
 void scene_setup()
 {
-    log_debug("Meshes");
     triangle = make_mesh(triangle_data, &transform);
     triangle2 = make_mesh(triangle_data, &transform2);
 
@@ -96,30 +95,29 @@ void scene_setup()
                 [1].format = SG_VERTEXFORMAT_FLOAT4}}});
 }
 
+float j = 0;
+
 void mesh_system()
 {
     c_forpair(entity, type_set, cmap_entities, scene->entities)
     {
         log_debug("Entity ( %d ) with TS of size: %d", *_.entity, _.type_set->size);
 
-        if (TypeSet_get(_.type_set, CT_MESH) == NULL)
+        if (TypeSet_get(_.type_set, CT_MESH) == NULL || TypeSet_get(_.type_set, CT_TRANSFORM) == NULL)
             continue;
 
         Mesh *mesh = get_component_for_entity(scene, *_.entity, CT_MESH);
+        Transform *transform = get_component_for_entity(scene, *_.entity, CT_TRANSFORM);
+
+        rotate_euler(transform, (vec3){j / 10.0f, j, 0});
+        compute_transform(transform);
 
         render_mesh(mesh, pip);
     }
 }
 
-float j = 0;
-
 void scene_draw()
 {
-    rotate_euler(&transform, (vec3){j / 10.0f, j, 0});
-    rotate_euler(&transform2, (vec3){j / 10.0f, j, 0});
-    compute_transform(&transform);
-    compute_transform(&transform2);
-
     j += 0.01f;
 
     mesh_system();
