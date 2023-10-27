@@ -51,7 +51,7 @@ void scene_setup()
     scene = new_scene();
 
     const int iter = 5000;
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < iter; i++)
     {
         const float pos = ((float)i / ((float)iter / 2.0f)) - 1.0f;
         Transform transform = {
