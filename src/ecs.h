@@ -42,3 +42,8 @@ Scene *new_scene();
 EntityID new_entity(Scene *scene);
 void assign_to_entity(Scene *scene, EntityID entity, CType type, size_t component_size, void *init);
 void *get_component_for_entity(Scene *scene, EntityID entity, CType type);
+
+// Gets the pool for a component type using the
+// Component Type ID. Returns `null` if the
+// pool does not exist.
+Pool *get_pool_for_ct(Scene *scene, CType type);

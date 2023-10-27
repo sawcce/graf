@@ -102,12 +102,13 @@ float j = 0;
 
 void mesh_system()
 {
-    c_forpair(entity, type_set, cmap_entities, scene->entities)
-    {
-        if (TypeSet_get(_.type_set, CT_MESH) == NULL || TypeSet_get(_.type_set, CT_TRANSFORM) == NULL)
-            continue;
+    Pool *meshes = get_pool_for_ct(scene, CT_MESH);
 
-        Mesh *mesh = get_component_for_entity(scene, *_.entity, CT_MESH);
+    c_forpair(entity, mesh, Pool, *meshes)
+    {
+        // Deref once because the type of a pool key is *void
+        // and we get a reference to that so **void
+        Mesh *mesh = *_.mesh;
         Transform *transform = get_component_for_entity(scene, *_.entity, CT_TRANSFORM);
 
         rotate_euler(transform, (vec3){j / 10.0f, j, 0});

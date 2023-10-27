@@ -41,3 +41,8 @@ void *get_component_for_entity(Scene *scene, EntityID entity, CType type)
     Pool *pool = &Pools_get_mut(&scene->pools, type)->second;
     return Pool_get_mut(pool, entity)->second;
 }
+
+Pool *get_pool_for_ct(Scene *scene, CType type)
+{
+    return &Pools_get(&scene->pools, type)->second;
+}
