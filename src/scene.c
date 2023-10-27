@@ -104,8 +104,6 @@ void mesh_system()
 {
     c_forpair(entity, type_set, cmap_entities, scene->entities)
     {
-        // log_debug("Entity ( %d ) with TS of size: %d", *_.entity, _.type_set->size);
-
         if (TypeSet_get(_.type_set, CT_MESH) == NULL || TypeSet_get(_.type_set, CT_TRANSFORM) == NULL)
             continue;
 
