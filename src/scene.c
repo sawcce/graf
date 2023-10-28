@@ -4,6 +4,8 @@
 
 #include "components/mesh.h"
 #include "components/transform.h"
+#include "components/camera.h"
+
 #include "ecs.h"
 #include "log.h"
 
@@ -50,6 +52,17 @@ void scene_setup()
 
     scene = new_scene();
 
+    EntityID camera = new_entity(scene);
+    assign_to_entity(scene, camera, CT_CAMERA, sizeof(Camera), &(Camera){
+                                                                   .active = true,
+                                                                   .fov = (70.0f / 360.0f) * 2 * GLM_PI,
+                                                                   .aspect_ratio = 4.0f / 3.0f,
+                                                               });
+
+    assign_to_entity(scene, camera, CT_TRANSFORM, sizeof(Transform), &(Transform){
+                                                                         .position = {0, 0, -1},
+                                                                     });
+
     const int iter = 5000;
     for (int i = 0; i < iter; i++)
     {
@@ -70,15 +83,19 @@ void scene_setup()
             "layout(location=0) in vec4 position;\n"
             "layout(location=1) in vec4 color0;\n"
             "uniform mat4 transform;\n"
+            "uniform mat4 perspective;\n"
+            "uniform mat4 view;\n"
             "out vec4 color;\n"
             "void main() {\n"
-            "  gl_Position = transform * position;\n"
+            "  gl_Position = perspective * view * transform * position;\n"
             "  color = color0;\n"
             "}\n",
         .vs.uniform_blocks[0] = {
-            .size = sizeof(mat4),
+            .size = 3 * sizeof(mat4),
             .uniforms = {
                 [0] = {.name = "transform", .type = SG_UNIFORMTYPE_MAT4},
+                [1] = {.name = "perspective", .type = SG_UNIFORMTYPE_MAT4},
+                [2] = {.name = "view", .type = SG_UNIFORMTYPE_MAT4},
             },
         },
         .fs.source = "#version 330\n"
@@ -99,9 +116,27 @@ void scene_setup()
 }
 
 float j = 0;
+float z = 90;
 
 void mesh_system()
 {
+    Pool *cameras = get_pool_for_ct(scene, CT_CAMERA);
+    Camera *active;
+    Transform *c_transform;
+
+    c_foreach(camera, Pool, *cameras)
+    {
+        Camera *cam = camera.ref->second;
+        if (cam->active)
+        {
+            active = cam;
+            c_transform = get_component_for_entity(scene, camera.ref->first, CT_TRANSFORM);
+        }
+    }
+
+    if (active == NULL)
+        return;
+
     Pool *meshes = get_pool_for_ct(scene, CT_MESH);
 
     c_forpair(entity, mesh, Pool, *meshes)
@@ -113,14 +148,17 @@ void mesh_system()
 
         rotate_euler(transform, (vec3){j / 10.0f, j, 0});
         compute_transform(transform);
+        glm_perspective(active->fov, active->aspect_ratio, 0.0f, 1000.0f, active->perspective);
+        rotate_euler(c_transform, (vec3){0, 90, 0});
 
-        render_mesh(mesh, transform, pip);
+        render_mesh(mesh, transform, active, c_transform, pip);
     }
 }
 
 void scene_draw()
 {
     j += 0.01f;
+    z += 1.0f;
 
     mesh_system();
 }
