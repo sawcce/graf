@@ -116,7 +116,6 @@ void scene_setup()
 }
 
 float j = 0;
-float z = 90;
 
 void mesh_system()
 {
@@ -149,7 +148,7 @@ void mesh_system()
         rotate_euler(transform, (vec3){j / 10.0f, j, 0});
         compute_transform(transform);
         glm_perspective(active->fov, active->aspect_ratio, 0.0f, 1000.0f, active->perspective);
-        rotate_euler(c_transform, (vec3){0, 90, 0});
+        rotate_euler(c_transform, (vec3){0, GLM_PIf, 0});
 
         render_mesh(mesh, transform, active, c_transform, pip);
     }
@@ -158,7 +157,6 @@ void mesh_system()
 void scene_draw()
 {
     j += 0.01f;
-    z += 1.0f;
 
     mesh_system();
 }
