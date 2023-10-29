@@ -24,7 +24,7 @@ EntityID new_entity(Scene *scene)
     return id;
 }
 
-void assign_to_entity(Scene *scene, EntityID entity, CType type, size_t component_size, void *init)
+void *assign_to_entity(Scene *scene, EntityID entity, CType type, size_t component_size, void *init)
 {
     cmap_entities_value *components = cmap_entities_get_mut(&scene->entities, entity);
     TypeSet_push(&components->second, type);
@@ -34,6 +34,7 @@ void assign_to_entity(Scene *scene, EntityID entity, CType type, size_t componen
     memcpy(component, init, component_size);
 
     Pool_insert(pool, entity, component);
+    return component;
 }
 
 void *get_component_for_entity(Scene *scene, EntityID entity, CType type)
