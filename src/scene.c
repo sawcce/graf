@@ -111,6 +111,10 @@ void scene_setup()
 
     pip = sg_make_pipeline(&(sg_pipeline_desc){
         .index_type = SG_INDEXTYPE_UINT32,
+        .depth = {
+            .write_enabled = true,
+            .compare = SG_COMPAREFUNC_LESS_EQUAL,
+        },
         .shader = shd,
         .layout = {
             .attrs = {
