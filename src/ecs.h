@@ -7,6 +7,7 @@ typedef enum
     CT_MESH = 1,
     CT_TRANSFORM,
     CT_CAMERA,
+    CT_SPINNING,
 } CType;
 
 // cset_ctype: A hashset of component types

@@ -93,6 +93,7 @@ void scene_setup()
     EntityID entity = new_entity(scene);
     assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
     assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
+    assign_to_entity(scene, entity, CT_SPINNING, 0, NULL);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -166,11 +167,21 @@ void mesh_system()
         Mesh *mesh = *_.mesh;
         Transform *transform = get_component_for_entity(scene, *_.entity, CT_TRANSFORM);
 
-        rotate_euler(transform, (vec3){j / 10.0f, j, 0});
         compute_transform(transform);
         glm_perspective(active->fov, active->aspect_ratio, 0.1f, 1000.0f, active->perspective);
 
         render_mesh(mesh, transform, active, c_transform, pip);
+    }
+}
+
+void spinning_system()
+{
+    Pool *spinning = get_pool_for_ct(scene, CT_SPINNING);
+    c_foreach(entity, Pool, *spinning)
+    {
+        EntityID eID = entity.ref->first;
+        Transform *transform = get_component_for_entity(scene, eID, CT_TRANSFORM);
+        rotate_euler(transform, (vec3){j / 10.0f, j, 0});
     }
 }
 
@@ -179,4 +190,5 @@ void scene_draw()
     j += 0.01f;
 
     mesh_system();
+    spinning_system();
 }
