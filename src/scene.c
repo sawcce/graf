@@ -12,20 +12,39 @@
 /* a vertex buffer */
 const float vertices[] = {
     // positions            // colors
-    0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f};
+    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+    -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
+    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+    -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f,
+    0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f};
 
 const int indices[] = {
-    0,
-    1,
-    2,
-};
+    // Front
+    0, 1, 2,
+    1, 2, 3,
+    // Back
+    5, 6, 7,
+    4, 5, 6,
+    // Right
+    0, 4, 2,
+    4, 2, 6,
+    // Left
+    1, 5, 3,
+    5, 3, 7,
+    // Top
+    0, 1, 5,
+    0, 5, 4,
+    // Bottom
+    2, 3, 7,
+    7, 2, 6};
 
 MeshData triangle_data = {
     .vertices = SG_RANGE(vertices),
     .indices = SG_RANGE(indices),
-    .elements_amount = 3,
+    .elements_amount = sizeof(indices) / sizeof(int),
     .id = "triangular",
 };
 
@@ -66,19 +85,14 @@ void scene_setup()
                                                                });
     assign_to_entity(scene, camera, CT_TRANSFORM, sizeof(Transform), &camera_transform);
 
-    const int iter = 5000;
-    for (int i = 0; i < iter; i++)
-    {
-        const float pos = ((float)i / ((float)iter / 2.0f)) - 1.0f;
-        Transform transform = {
-            .position = {pos, pos, 0},
-            .scale = {0.1f, 0.1f, 0.1f},
-        };
+    Transform transform = {
+        .position = {0, 0, 0},
+        .scale = {0.5f, 0.5f, 0.5f},
+    };
 
-        EntityID entity = new_entity(scene);
-        assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
-        assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
-    }
+    EntityID entity = new_entity(scene);
+    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
+    assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -117,9 +131,9 @@ void scene_setup()
         },
         .shader = shd,
         .layout = {
-            .attrs = {
-                [0].format = SG_VERTEXFORMAT_FLOAT3,
-                [1].format = SG_VERTEXFORMAT_FLOAT4}}});
+            .attrs = {[0].format = SG_VERTEXFORMAT_FLOAT3, [1].format = SG_VERTEXFORMAT_FLOAT4},
+        },
+    });
 }
 
 float j = 0;
@@ -154,7 +168,7 @@ void mesh_system()
 
         rotate_euler(transform, (vec3){j / 10.0f, j, 0});
         compute_transform(transform);
-        glm_perspective(active->fov, active->aspect_ratio, 0.0f, 1000.0f, active->perspective);
+        glm_perspective(active->fov, active->aspect_ratio, 0.1f, 1000.0f, active->perspective);
 
         render_mesh(mesh, transform, active, c_transform, pip);
     }
