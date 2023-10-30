@@ -52,16 +52,19 @@ void scene_setup()
 
     scene = new_scene();
 
+    Transform camera_transform = {
+        .position = {0, 0, -4},
+    };
+
+    rotate_euler(&camera_transform, (vec3){0, GLM_PIf, 0});
+
     EntityID camera = new_entity(scene);
     assign_to_entity(scene, camera, CT_CAMERA, sizeof(Camera), &(Camera){
                                                                    .active = true,
                                                                    .fov = (70.0f / 360.0f) * 2 * GLM_PI,
                                                                    .aspect_ratio = 4.0f / 3.0f,
                                                                });
-
-    assign_to_entity(scene, camera, CT_TRANSFORM, sizeof(Transform), &(Transform){
-                                                                         .position = {0, 0, -1},
-                                                                     });
+    assign_to_entity(scene, camera, CT_TRANSFORM, sizeof(Transform), &camera_transform);
 
     const int iter = 5000;
     for (int i = 0; i < iter; i++)
@@ -148,7 +151,6 @@ void mesh_system()
         rotate_euler(transform, (vec3){j / 10.0f, j, 0});
         compute_transform(transform);
         glm_perspective(active->fov, active->aspect_ratio, 0.0f, 1000.0f, active->perspective);
-        rotate_euler(c_transform, (vec3){0, GLM_PIf, 0});
 
         render_mesh(mesh, transform, active, c_transform, pip);
     }
