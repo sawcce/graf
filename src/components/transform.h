@@ -10,5 +10,6 @@ typedef struct
     mat4 computed;
 } Transform;
 
+void set_rotation_euler(Transform *transform, vec3 euler);
 void rotate_euler(Transform *transform, vec3 euler);
 void compute_transform(Transform *transform);

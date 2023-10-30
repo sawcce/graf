@@ -9,7 +9,7 @@
 // operations.
 
 // Rotates a transform component using euler angles
-void rotate_euler(Transform *transform, vec3 euler)
+void set_rotation_euler(Transform *transform, vec3 euler)
 {
     mat4 rotation_matrix;
     glm_euler_xyz(euler, rotation_matrix);
@@ -17,6 +17,16 @@ void rotate_euler(Transform *transform, vec3 euler)
     versor new_rotation;
     glm_mat4_quat(rotation_matrix, new_rotation);
     glm_vec4_copy(new_rotation, transform->rotation);
+}
+
+void rotate_euler(Transform *transform, vec3 euler)
+{
+    mat4 rotation_matrix;
+    glm_euler_xyz(euler, rotation_matrix);
+
+    versor new_rotation;
+    glm_mat4_quat(rotation_matrix, new_rotation);
+    glm_quat_mul(transform->rotation, new_rotation, transform->rotation);
 }
 
 // Computes the transform matrix of a `Transform` component

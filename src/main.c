@@ -1,17 +1,17 @@
-#define SOKOL_IMPL
+#include "scene.h"
+#include "log.h"
 
-#include "sokol_gfx.h"
+#define SOKOL_IMPL
 #include "sokol_app.h"
+#include "sokol_gfx.h"
 #include "sokol_log.h"
 #include "sokol_glue.h"
 #include "sokol_time.h"
 
-#include "scene.h"
-#include "log.h"
-
 sg_pass_action pass_action;
 uint64_t current_time;
 uint64_t delta_time;
+float delta_time_sec;
 float_t refresh_rate;
 
 char *window_title;
@@ -47,6 +47,7 @@ void init(void)
 void frame(void)
 {
     delta_time = stm_laptime(&current_time);
+    delta_time_sec = stm_sec(delta_time);
     float_t new_refresh_rate = 1.0f / stm_sec(delta_time);
 
     if ((int64_t)new_refresh_rate != (int64_t)refresh_rate)
@@ -79,5 +80,5 @@ sapp_desc sokol_main(int argc, char *argv[])
         .window_title = "DJI",
         .logger.func = slog_func,
         .win32_console_attach = true,
-    };
+        .event_cb = event};
 }

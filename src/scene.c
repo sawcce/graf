@@ -1,12 +1,13 @@
 #include "scene.h"
+#include "ecs.h"
 
 #include "cglm/cglm.h"
 
 #include "components/mesh.h"
 #include "components/transform.h"
 #include "components/camera.h"
+#include <omp.h>
 
-#include "ecs.h"
 #include "log.h"
 
 /* a vertex buffer */
@@ -64,9 +65,13 @@ Transform transform2 = {
 };
 
 Scene *scene;
+AppEventQueue event_queue;
 
 void scene_setup()
 {
+    sapp_lock_mouse(true);
+    event_queue = AppEventQueue_init();
+
     triangle = make_mesh(triangle_data);
 
     scene = new_scene();
@@ -75,7 +80,7 @@ void scene_setup()
         .position = {0, 0, -4},
     };
 
-    rotate_euler(&camera_transform, (vec3){0, GLM_PIf, 0});
+    set_rotation_euler(&camera_transform, (vec3){0, GLM_PIf, 0});
 
     EntityID camera = new_entity(scene);
     assign_to_entity(scene, camera, CT_CAMERA, sizeof(Camera), &(Camera){
@@ -181,14 +186,47 @@ void spinning_system()
     {
         EntityID eID = entity.ref->first;
         Transform *transform = get_component_for_entity(scene, eID, CT_TRANSFORM);
-        rotate_euler(transform, (vec3){j / 10.0f, j, 0});
+        set_rotation_euler(transform, (vec3){j / 10.0f, j, 0});
     }
+}
+
+extern float delta_time_sec;
+
+void camera_move_system(float mouse_x, float mouse_y)
+{
+    Pool *camera_pool = get_pool_for_ct(scene, CT_CAMERA);
+    c_foreach(camera, Pool, *camera_pool)
+    {
+        Transform *camera_transform = get_component_for_entity(scene, camera.ref->first, CT_TRANSFORM);
+        rotate_euler(camera_transform, (vec3){mouse_x * delta_time_sec, mouse_y * delta_time_sec, 0});
+    }
+}
+
+void input_system()
+{
+    while (!AppEventQueue_empty(&event_queue))
+    {
+        sapp_event *event = AppEventQueue_pull(&event_queue);
+
+        switch (event->type)
+        {
+        case SAPP_EVENTTYPE_MOUSE_MOVE:
+            camera_move_system(-event->mouse_dy * 1.0f, event->mouse_dx * 1.0f);
+        }
+    }
+}
+
+void event(sapp_event *event)
+{
+    AppEventQueue_push(&event_queue, event);
 }
 
 void scene_draw()
 {
     j += 0.01f;
 
+#pragma omp parallel
+    input_system();
     mesh_system();
     spinning_system();
 }
