@@ -32,6 +32,11 @@ void init(void)
         .logger.func = slog_func,
     });
     pass_action = (sg_pass_action){
+        .depth = {
+            .load_action = SG_LOADACTION_CLEAR,
+            .store_action = SG_STOREACTION_DONTCARE,
+            .clear_value = 1.0f,
+        },
         .colors[0] = {.load_action = SG_LOADACTION_CLEAR, .clear_value = {1.0f, 0.0f, 0.0f, 1.0f}}};
 
     scene_setup();
