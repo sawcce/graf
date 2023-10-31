@@ -132,6 +132,12 @@ void scene_setup()
     });
 }
 
+void scene_destroy()
+{
+    sg_destroy_shader(shd);
+    sg_destroy_pipeline(pip);
+}
+
 float j = 0;
 
 void mesh_system()

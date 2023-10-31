@@ -8,4 +8,5 @@
 
 void scene_setup();
 void scene_draw();
+void scene_destroy();
 void event(sapp_event *event);

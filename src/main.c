@@ -66,6 +66,7 @@ void frame(void)
 void cleanup(void)
 {
     free(window_title);
+    scene_destroy();
     sg_shutdown();
 }
 
