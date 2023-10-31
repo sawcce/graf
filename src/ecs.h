@@ -22,10 +22,18 @@ typedef enum
 #define i_tag entities
 #include "stc/cmap.h"
 
+typedef void *Component;
+
 #define i_key EntityID
 #define i_val void *
-#define i_type Pool
+#define i_type ComponentList
 #include "stc/cmap.h"
+
+typedef struct
+{
+    ComponentList list;
+    void (*free_method)(void *);
+} Pool;
 
 #define i_key CType
 #define i_val Pool
@@ -40,7 +48,11 @@ typedef struct
 
 Scene *new_scene();
 
+void Component_drop(Pool *self, EntityID key);
+void Entity_drop(Scene *scene, EntityID entity);
+
 EntityID new_entity(Scene *scene);
+void create_pool_for_ct(Scene *scene, CType type, void (*free_method)(void *));
 void *assign_to_entity(Scene *scene, EntityID entity, CType type, size_t component_size, void *init);
 void *get_component_for_entity(Scene *scene, EntityID entity, CType type);
 

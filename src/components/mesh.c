@@ -40,3 +40,10 @@ void render_mesh(Mesh *mesh, Transform *transform, Camera *viewer, Transform *ca
     sg_apply_bindings(&mesh->bindings);
     sg_draw(0, mesh->mesh_data.elements_amount, 1);
 }
+
+void drop_mesh(Mesh *mesh)
+{
+    log_debug("Dropping mesh: %s", mesh->mesh_data.id);
+    sg_destroy_buffer(mesh->bindings.index_buffer);
+    sg_destroy_buffer(mesh->bindings.vertex_buffers[0]);
+}

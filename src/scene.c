@@ -66,6 +66,11 @@ void scene_setup()
 
     scene = new_scene();
 
+    create_pool_for_ct(scene, CT_TRANSFORM, NULL);
+    create_pool_for_ct(scene, CT_CAMERA, NULL);
+    create_pool_for_ct(scene, CT_SPINNING, NULL);
+    create_pool_for_ct(scene, CT_MESH, drop_mesh);
+
     Transform camera_transform = {
         .position = {0, 0, -4},
     };
@@ -134,6 +139,11 @@ void scene_setup()
 
 void scene_destroy()
 {
+    c_foreach(entity, cmap_entities, scene->entities)
+    {
+        Entity_drop(scene, entity.ref->first);
+    }
+
     sg_destroy_shader(shd);
     sg_destroy_pipeline(pip);
 }
@@ -146,7 +156,7 @@ void mesh_system()
     Camera *active;
     Transform *c_transform;
 
-    c_foreach(camera, Pool, *cameras)
+    c_foreach(camera, ComponentList, cameras->list)
     {
         Camera *cam = camera.ref->second;
         if (cam->active)
@@ -161,7 +171,7 @@ void mesh_system()
 
     Pool *meshes = get_pool_for_ct(scene, CT_MESH);
 
-    c_forpair(entity, mesh, Pool, *meshes)
+    c_forpair(entity, mesh, ComponentList, meshes->list)
     {
         // Deref once because the type of a pool key is *void
         // and we get a reference to that so **void
@@ -178,7 +188,7 @@ void mesh_system()
 void spinning_system()
 {
     Pool *spinning = get_pool_for_ct(scene, CT_SPINNING);
-    c_foreach(entity, Pool, *spinning)
+    c_foreach(entity, ComponentList, spinning->list)
     {
         EntityID eID = entity.ref->first;
         Transform *transform = get_component_for_entity(scene, eID, CT_TRANSFORM);
@@ -191,7 +201,7 @@ extern float delta_time_sec;
 void camera_move_system(float mouse_x, float mouse_y)
 {
     Pool *camera_pool = get_pool_for_ct(scene, CT_CAMERA);
-    c_foreach(camera, Pool, *camera_pool)
+    c_foreach(camera, ComponentList, camera_pool->list)
     {
         Transform *camera_transform = get_component_for_entity(scene, camera.ref->first, CT_TRANSFORM);
         rotate_euler(camera_transform, (vec3){mouse_x * delta_time_sec, mouse_y * delta_time_sec, 0});
