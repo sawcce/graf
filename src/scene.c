@@ -54,16 +54,6 @@ Mesh triangle;
 sg_shader shd;
 sg_pipeline pip;
 
-Transform transform = {
-    .position = {0, 0.5f, 0},
-    .scale = {0.5f, 0.5f, 0.5f},
-};
-
-Transform transform2 = {
-    .position = {0, 0.0f, 0},
-    .scale = {0.5f, 0.5f, 0.5f},
-};
-
 Scene *scene;
 AppEventQueue event_queue;
 
