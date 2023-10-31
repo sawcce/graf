@@ -211,7 +211,7 @@ void input_system()
         switch (event->type)
         {
         case SAPP_EVENTTYPE_MOUSE_MOVE:
-            camera_move_system(-event->mouse_dy * 1.0f, event->mouse_dx * 1.0f);
+            camera_move_system(-event->mouse_dy * 1.0f, -event->mouse_dx * 1.0f);
         }
     }
 }
