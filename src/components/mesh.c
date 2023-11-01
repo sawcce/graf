@@ -1,8 +1,10 @@
 #include "mesh.h"
 #include "log.h"
 
-Mesh make_mesh(MeshData mesh_data)
+Mesh *make_mesh(MeshData mesh_data)
 {
+    Mesh *new_mesh = malloc(sizeof(Mesh));
+
     sg_buffer v_buff = sg_make_buffer(&(sg_buffer_desc){
         .type = SG_BUFFERTYPE_VERTEXBUFFER,
         .data = mesh_data.vertices});
@@ -11,13 +13,15 @@ Mesh make_mesh(MeshData mesh_data)
         .type = SG_BUFFERTYPE_INDEXBUFFER,
         .data = mesh_data.indices});
 
-    return (Mesh){
+    *new_mesh = (Mesh){
         .mesh_data = mesh_data,
         .bindings = (sg_bindings){
             .vertex_buffers[0] = v_buff,
             .index_buffer = i_buff,
         },
     };
+
+    return new_mesh;
 }
 
 typedef struct

@@ -7,6 +7,8 @@
 #include "components/transform.h"
 #include "components/camera.h"
 
+#include "loaders/obj_loader.h"
+
 #define FAST_OBJ_IMPLEMENTATION
 #include "fast_obj.h"
 
@@ -29,27 +31,7 @@ AppEventQueue event_queue;
 
 void scene_setup()
 {
-    mesh = fast_obj_read("res/teapot.obj");
-    teapot_data.vertices = (sg_range){
-        .ptr = mesh->positions + 3,
-        .size = mesh->position_count * 3 * sizeof(int),
-    };
-
-    int *indices = malloc(sizeof(int) * mesh->index_count);
-    for (int i = 0; i < mesh->index_count; i++)
-    {
-        fastObjIndex index = mesh->indices[i];
-        indices[i] = index.p - 1;
-    }
-
-    teapot_data.indices = (sg_range){
-        .ptr = indices,
-        .size = sizeof(int) * mesh->index_count,
-    };
-
-    teapot_data.elements_amount = mesh->index_count;
-
-    teapot = make_mesh(teapot_data);
+    teapot = *load_obj("res/teapot2.obj");
 
     sapp_lock_mouse(true);
     event_queue = AppEventQueue_init();
@@ -123,7 +105,10 @@ void scene_setup()
         },
         .shader = shd,
         .layout = {
-            .attrs = {[0].format = SG_VERTEXFORMAT_FLOAT3},
+            .attrs = {
+                [0].format = SG_VERTEXFORMAT_FLOAT3,
+                [1].format = SG_VERTEXFORMAT_FLOAT3,
+            },
         },
     });
 }

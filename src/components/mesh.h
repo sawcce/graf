@@ -23,6 +23,12 @@ typedef struct
     sg_bindings bindings;
 } Mesh;
 
-Mesh make_mesh(MeshData mesh_data);
+Mesh *make_mesh(MeshData mesh_data);
 void render_mesh(Mesh *mesh, Transform *transform, Camera *viewer, Transform *camera_transform, sg_pipeline pip);
 void drop_mesh(Mesh *mesh);
+
+typedef struct
+{
+    vec3 position;
+    vec3 normal;
+} Vertex;
