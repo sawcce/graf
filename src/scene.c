@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "ecs.h"
+#include "sokol_time.h"
 
 #include "cglm/cglm.h"
 
@@ -16,18 +17,16 @@
 
 #include "log.h"
 
-Mesh teapot;
-
 sg_shader shd;
 sg_pipeline pip;
 
 Scene *scene;
 AppEventQueue event_queue;
 
+void entity_setup();
+
 void scene_setup()
 {
-    teapot = *load_obj("res/teapot_smooth.obj");
-
     sapp_lock_mouse(true);
     event_queue = AppEventQueue_init();
 
@@ -38,29 +37,8 @@ void scene_setup()
     create_pool_for_ct(scene, CT_SPINNING, NULL);
     create_pool_for_ct(scene, CT_MESH, drop_mesh);
 
-    Transform camera_transform = {
-        .position = {0, 0, -4},
-    };
-
-    set_rotation_euler(&camera_transform, (vec3){0, GLM_PIf, 0});
-
-    EntityID camera = new_entity(scene);
-    assign_to_entity(scene, camera, CT_CAMERA, sizeof(Camera), &(Camera){
-                                                                   .active = true,
-                                                                   .fov = (70.0f / 360.0f) * 2 * GLM_PI,
-                                                                   .aspect_ratio = 4.0f / 3.0f,
-                                                               });
-    assign_to_entity(scene, camera, CT_TRANSFORM, sizeof(Transform), &camera_transform);
-
-    Transform transform = {
-        .position = {0, 0, 0},
-        .scale = {0.5f, 0.5f, 0.5f},
-    };
-
-    EntityID entity = new_entity(scene);
-    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &teapot);
-    assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
-    assign_to_entity(scene, entity, CT_SPINNING, 0, NULL);
+#pragma omp parallel
+    entity_setup();
 
     shd = sg_make_shader(&(sg_shader_desc){
         .vs.source =
@@ -117,6 +95,36 @@ void scene_destroy()
 
     sg_destroy_shader(shd);
     sg_destroy_pipeline(pip);
+}
+
+void entity_setup()
+{
+    // Camera
+    Transform camera_transform = {
+        .position = {0, 0, -4},
+    };
+
+    set_rotation_euler(&camera_transform, (vec3){0, GLM_PIf, 0});
+
+    EntityID camera = new_entity(scene);
+    assign_to_entity(scene, camera, CT_CAMERA, sizeof(Camera), &(Camera){
+                                                                   .active = true,
+                                                                   .fov = (70.0f / 360.0f) * 2 * GLM_PI,
+                                                                   .aspect_ratio = 4.0f / 3.0f,
+                                                               });
+    assign_to_entity(scene, camera, CT_TRANSFORM, sizeof(Transform), &camera_transform);
+
+    // Teapot
+    Transform transform = {
+        .position = {0, 0, 0},
+        .scale = {0.5f, 0.5f, 0.5f},
+    };
+    Mesh *teapot = load_obj("res/teapot_smooth.obj");
+
+    EntityID entity = new_entity(scene);
+    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), teapot);
+    assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
+    assign_to_entity(scene, entity, CT_SPINNING, 0, NULL);
 }
 
 float j = 0;
