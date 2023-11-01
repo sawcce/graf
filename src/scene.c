@@ -52,7 +52,7 @@ void scene_setup()
             "vec3 color0 = vec3(1, 1, 1);\n"
             "void main() {\n"
             "  gl_Position = perspective * view * transform * position;\n"
-            "  color = vec4(color0 * dot(normal, vec3(1, 1, 1)), 1);\n"
+            "  color = vec4(color0 * dot(vec4(normal, 0), vec4(-1, 1, -1, 0) * transform), 1);\n"
             "}\n",
         .vs.uniform_blocks[0] = {
             .size = 3 * sizeof(mat4),
