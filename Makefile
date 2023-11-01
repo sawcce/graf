@@ -1,7 +1,7 @@
-INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include -Ilib/stc/include -Ilib/fastobj
+INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Isrc/components -Ilib/cglm/include -Ilib/stc/include -Ilib/fastobj
 
-src = $(wildcard src/*.c)
-outputs = $(wildcard build/*.o)
+src = $(wildcard src/**/*.c) $(wildcard src/*.c)
+outputs = $(wildcard build/**/*.o) $(wildcard build/*.o)
 
 NAME = el.exe
 
@@ -30,6 +30,8 @@ build/stc:
 .PHONY: bootstrap
 bootstrap: sokol logc cglm stc build/stc fastobj
 	mkdir build
+	mkdir build/components
+	mkdir build/loaders
 
 build/log.o: lib/logc/src/log.c
 	$(CC) lib/logc/src/log.c -c -o build/log.o $(CFLAGS)
@@ -39,12 +41,11 @@ build/log.o: lib/logc/src/log.c
 .PHONY: all $(src)
 all: $(src)
 $(src):
-	echo "Building: $@" "$<"
-	$(CC) $@ -c -o build/$(@:src/%.c=%.o) $(CFLAGS) $(INC) $(SOKOL)
+	@echo "Building: $@" "$<"
+	@$(CC) $@ -c -o build/$(@:src/%.c=%.o) $(CFLAGS) $(INC) $(SOKOL)
 
 exe: all build/log.o build/stc
 	@echo "Outputs: " $(outputs)
-	@echo "Outputs: " $(obj)
 	$(CC) $(outputs) -o build/$(NAME) -Wall $(CFLAGS) $(INC) $(SOKOL)
 
 build: exe
