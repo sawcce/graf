@@ -16,8 +16,8 @@ Mesh *load_obj(const char *path)
     MeshData *mesh_data = malloc(sizeof(MeshData));
     fastObjMesh *obj_data = fast_obj_read(path);
 
-    VertexList vertices = VertexList_init();
-    IndexList indices = IndexList_init();
+    VertexList vertices = VertexList_with_capacity(obj_data->position_count);
+    IndexList indices = IndexList_with_capacity(obj_data->index_count);
 
     for (int i = 0; i < obj_data->index_count; i++)
     {
@@ -33,7 +33,7 @@ Mesh *load_obj(const char *path)
         for (int i = 0; i < VertexList_size(&vertices); i++)
         {
             Vertex *v = VertexList_at(&vertices, i);
-            if (glm_vec3_eqv(position, v->position) && glm_vec3_eqv(normal, v->normal))
+            if (glm_vec3_eqv_eps(position, v->position) && glm_vec3_eqv_eps(normal, v->normal))
             {
                 IndexList_push(&indices, i);
                 match = true;
