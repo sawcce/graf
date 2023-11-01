@@ -16,12 +16,7 @@
 
 #include "log.h"
 
-MeshData teapot_data = {
-    .id = "teapot",
-};
-
 Mesh teapot;
-fastObjMesh *mesh;
 
 sg_shader shd;
 sg_pipeline pip;
@@ -31,7 +26,7 @@ AppEventQueue event_queue;
 
 void scene_setup()
 {
-    teapot = *load_obj("res/teapot2.obj");
+    teapot = *load_obj("res/teapot_smooth.obj");
 
     sapp_lock_mouse(true);
     event_queue = AppEventQueue_init();
@@ -71,15 +66,15 @@ void scene_setup()
         .vs.source =
             "#version 330\n"
             "layout(location=0) in vec4 position;\n"
-            // "layout(location=1) in vec4 color0;\n"
+            "layout(location=1) in vec3 normal;\n"
             "uniform mat4 transform;\n"
             "uniform mat4 perspective;\n"
             "uniform mat4 view;\n"
             "out vec4 color;\n"
-            "vec4 color0 = vec4(1, 1, 1, 1);\n"
+            "vec3 color0 = vec3(1, 1, 1);\n"
             "void main() {\n"
             "  gl_Position = perspective * view * transform * position;\n"
-            "  color = color0;\n"
+            "  color = vec4(color0 * dot(normal, vec3(1, 1, 1)), 1);\n"
             "}\n",
         .vs.uniform_blocks[0] = {
             .size = 3 * sizeof(mat4),
