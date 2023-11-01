@@ -6,50 +6,20 @@
 #include "components/mesh.h"
 #include "components/transform.h"
 #include "components/camera.h"
+
+#define FAST_OBJ_IMPLEMENTATION
+#include "fast_obj.h"
+
 #include <omp.h>
 
 #include "log.h"
 
-/* a vertex buffer */
-const float vertices[] = {
-    // positions            // colors
-    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-    -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 1.0f, 1.0f};
-
-const int indices[] = {
-    // Front
-    0, 1, 2,
-    1, 2, 3,
-    // Back
-    5, 6, 7,
-    4, 5, 6,
-    // Right
-    0, 4, 2,
-    4, 2, 6,
-    // Left
-    1, 5, 3,
-    5, 3, 7,
-    // Top
-    0, 1, 5,
-    0, 5, 4,
-    // Bottom
-    2, 3, 7,
-    7, 2, 6};
-
-MeshData triangle_data = {
-    .vertices = SG_RANGE(vertices),
-    .indices = SG_RANGE(indices),
-    .elements_amount = sizeof(indices) / sizeof(int),
-    .id = "triangular",
+MeshData teapot_data = {
+    .id = "teapot",
 };
 
-Mesh triangle;
+Mesh teapot;
+fastObjMesh *mesh;
 
 sg_shader shd;
 sg_pipeline pip;
@@ -59,10 +29,30 @@ AppEventQueue event_queue;
 
 void scene_setup()
 {
+    mesh = fast_obj_read("res/teapot.obj");
+    teapot_data.vertices = (sg_range){
+        .ptr = mesh->positions + 3,
+        .size = mesh->position_count * 3 * sizeof(int),
+    };
+
+    int *indices = malloc(sizeof(int) * mesh->index_count);
+    for (int i = 0; i < mesh->index_count; i++)
+    {
+        fastObjIndex index = mesh->indices[i];
+        indices[i] = index.p - 1;
+    }
+
+    teapot_data.indices = (sg_range){
+        .ptr = indices,
+        .size = sizeof(int) * mesh->index_count,
+    };
+
+    teapot_data.elements_amount = mesh->index_count;
+
+    teapot = make_mesh(teapot_data);
+
     sapp_lock_mouse(true);
     event_queue = AppEventQueue_init();
-
-    triangle = make_mesh(triangle_data);
 
     scene = new_scene();
 
@@ -91,7 +81,7 @@ void scene_setup()
     };
 
     EntityID entity = new_entity(scene);
-    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &triangle);
+    assign_to_entity(scene, entity, CT_MESH, sizeof(Mesh), &teapot);
     assign_to_entity(scene, entity, CT_TRANSFORM, sizeof(Transform), &transform);
     assign_to_entity(scene, entity, CT_SPINNING, 0, NULL);
 
@@ -99,11 +89,12 @@ void scene_setup()
         .vs.source =
             "#version 330\n"
             "layout(location=0) in vec4 position;\n"
-            "layout(location=1) in vec4 color0;\n"
+            // "layout(location=1) in vec4 color0;\n"
             "uniform mat4 transform;\n"
             "uniform mat4 perspective;\n"
             "uniform mat4 view;\n"
             "out vec4 color;\n"
+            "vec4 color0 = vec4(1, 1, 1, 1);\n"
             "void main() {\n"
             "  gl_Position = perspective * view * transform * position;\n"
             "  color = color0;\n"
@@ -132,7 +123,7 @@ void scene_setup()
         },
         .shader = shd,
         .layout = {
-            .attrs = {[0].format = SG_VERTEXFORMAT_FLOAT3, [1].format = SG_VERTEXFORMAT_FLOAT4},
+            .attrs = {[0].format = SG_VERTEXFORMAT_FLOAT3},
         },
     });
 }

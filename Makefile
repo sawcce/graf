@@ -1,4 +1,4 @@
-INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include -Ilib/stc/include
+INC = -Ilib/sokol -Ilib/sokol/util -Ilib/logc/src -Isrc/ -Ilib/cglm/include -Ilib/stc/include -Ilib/fastobj
 
 src = $(wildcard src/components/*.c)
 outputs = $(wildcard build/*.o)
@@ -20,12 +20,15 @@ cglm:
 stc:
 	@git clone https://github.com/stclib/stc lib/stc 
 
+fastobj:
+	@git clone https://github.com/thisistherk/fast_obj lib/fastobj
+
 .PHONY: build/stc
 build/stc:
 	$(CC) lib/stc/src/libstc.c -c -o build/libstc.o $(CFLAGS) $(INC)
 
 .PHONY: bootstrap
-bootstrap: sokol logc cglm stc build/stc
+bootstrap: sokol logc cglm stc build/stc fastobj
 	mkdir build
 
 build/main.o: src/main.c
